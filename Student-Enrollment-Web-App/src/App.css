@@ -1,10 +1,38 @@
 .page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #111827, #1e3a8a);
+  background-color: #dbeafe;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 36px;
   padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.page::before {
+  content: "";
+  position: absolute;
+  right: 36px;
+  bottom: 26px;
+  width: 260px;
+  height: 260px;
+  background-image: url("https://upload.wikimedia.org/wikipedia/en/thumb/d/df/UC_Merced_Bobcats_logo.svg/250px-UC_Merced_Bobcats_logo.svg.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.14;
+  pointer-events: none;
+}
+
+.page-title {
+  margin: 70px 0 0;
+  text-align: center;
+  color: #1e293b;
+  font-size: 40px;
+  position: relative;
+  z-index: 1;
 }
 
 .login-card {
@@ -12,22 +40,25 @@
   max-width: 400px;
   background-color: white;
   padding: 35px;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  border-radius: 18px;
+  border-top: 8px solid #2563eb;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);
+  position: relative;
+  z-index: 1;
 }
 
 .login-card h1 {
   margin: 0;
   text-align: center;
-  color: #111827;
+  color: #1e293b;
   font-size: 32px;
 }
 
 .subtitle {
   text-align: center;
-  color: #6b7280;
+  color: #64748b;
   margin-top: 8px;
-  margin-bottom: 30px;
+  margin-bottom: 28px;
 }
 
 .input-group {
@@ -36,28 +67,30 @@
 
 .input-group label {
   display: block;
-  margin-bottom: 8px;
-  color: #374151;
-  font-weight: 600;
+  margin-bottom: 7px;
+  color: #334155;
+  font-weight: bold;
 }
 
 .input-group input {
   width: 100%;
-  box-sizing: border-box;
-  padding: 12px 14px;
-  border: 1px solid #d1d5db;
+  padding: 13px;
+  border: 2px solid #cbd5e1;
   border-radius: 10px;
   font-size: 16px;
   outline: none;
+  background-color: #f8fafc;
 }
 
 .input-group input:focus {
   border-color: #2563eb;
+  background-color: white;
 }
 
 button {
   width: 100%;
-  padding: 13px;
+  padding: 14px;
+  margin-top: 5px;
   background-color: #2563eb;
   color: white;
   border: none;
@@ -71,14 +104,13 @@ button:hover {
   background-color: #1d4ed8;
 }
 
-.bottom-text {
+.message {
   text-align: center;
-  color: #6b7280;
-  margin-top: 22px;
-}
-
-.bottom-text span {
-  color: #2563eb;
+  margin-top: 18px;
+  color: #334155;
   font-weight: bold;
-  cursor: pointer;
+  font-size: 14px;
+  background-color: #eff6ff;
+  padding: 10px;
+  border-radius: 8px;
 }

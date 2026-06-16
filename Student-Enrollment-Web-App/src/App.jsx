@@ -5,6 +5,7 @@ function App()
 {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
 
   function handleLogin(event) 
   {
@@ -16,11 +17,14 @@ function App()
       return;
     }
 
-    alert("Login button clicked. Backend is not connected yet.");
+    setMessage("Login button clicked. Backend is not connected yet.");
   }
 
   return (
+    
     <div className="page">
+
+      <h1 className="page-title">UC Merced</h1>
 
       <div className="login-card">
 
@@ -55,6 +59,8 @@ function App()
           </div>
 
           <button type="submit">Log In</button>
+
+          {message !== "" && <p className="message">{message}</p>}
 
         </form>
       </div>
