@@ -1,10 +1,12 @@
 from models import *
 from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt, \
     set_access_cookies, unset_jwt_cookies
 
 app = Flask(__name__)
 
+CORS(app, supports_credentials=True)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite3"
 db.init_app(app)
 
@@ -239,6 +241,8 @@ def teacher_classes():
             "name": course.name,
             "capacity": course.capacity,
             "teacher": course.teacher.username
+
+            # ----------------- Add course time here ------------------
         })
 
     return jsonify(result)
@@ -338,10 +342,18 @@ def teacher_page():
 @app.route("/me")
 @jwt_required()
 def me():
-    return {
-        "user_id": get_jwt_identity(),
-        "role": get_jwt()["role"]
-    }
+    user_id = int(get_jwt_identity())
+
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    return jsonify({
+        "user_id": user.id,
+        "username": user.username,
+        "role": user.role
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)

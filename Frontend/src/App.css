@@ -1,121 +1,339 @@
-.page {
-  min-height: 100vh;
-  background-color: #dbeafe;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 36px;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
+* {
+  box-sizing: border-box;
 }
 
-.page::before {
-  content: "";
-  position: absolute;
-  right: 36px;
-  bottom: 26px;
-  width: 260px;
-  height: 260px;
-  background-image: url("https://upload.wikimedia.org/wikipedia/en/thumb/d/df/UC_Merced_Bobcats_logo.svg/250px-UC_Merced_Bobcats_logo.svg.png");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  opacity: 0.14;
-  pointer-events: none;
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #17233b;
+  background-color: #dceafd;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+/* Login page */
+
+.page {
+  min-height: 100vh;
+  padding: 35px 20px;
+  background-color: #dceafd;
 }
 
 .page-title {
-  margin: 70px 0 0;
+  margin: 0 0 35px;
   text-align: center;
-  color: #1e293b;
-  font-size: 40px;
-  position: relative;
-  z-index: 1;
+  font-size: 42px;
+  color: #17233b;
 }
 
 .login-card {
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 45px;
   background-color: white;
-  padding: 46px;
-  border-radius: 18px;
-  border-top: 8px solid #2563eb;
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);
-  position: relative;
-  z-index: 1;
+  border-top: 8px solid #2f66e8;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(23, 35, 59, 0.15);
 }
-
-
-
 
 .login-card h1 {
   margin: 0;
   text-align: center;
-  color: #1e293b;
-  font-size: 40px;
+  font-size: 38px;
 }
 
 .subtitle {
+  margin-top: 8px;
+  margin-bottom: 35px;
   text-align: center;
-  color: #64748b;
-  margin-top: 10px;
-  margin-bottom: 34px;
-  font-size: 18px;
+  font-size: 20px;
+  color: #667085;
 }
 
 .input-group {
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
 .input-group label {
   display: block;
-  margin-bottom: 9px;
-  color: #334155;
-  font-weight: bold;
+  margin-bottom: 10px;
   font-size: 18px;
+  font-weight: bold;
 }
 
 .input-group input {
   width: 100%;
   padding: 16px;
-  border: 2px solid #cbd5e1;
-  border-radius: 10px;
   font-size: 18px;
-  outline: none;
   background-color: #f8fafc;
+  border: 2px solid #ccd7e5;
+  border-radius: 11px;
+  outline: none;
 }
 
 .input-group input:focus {
-  border-color: #2563eb;
-  background-color: white;
+  border-color: #2f66e8;
 }
 
-button {
+.login-button {
   width: 100%;
-  padding: 17px;
-  margin-top: 7px;
-  background-color: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 10px;
+  margin-top: 8px;
+  padding: 16px;
   font-size: 19px;
   font-weight: bold;
+  color: white;
+  background-color: #2f66e8;
+  border: none;
+  border-radius: 11px;
   cursor: pointer;
 }
 
-button:hover {
-  background-color: #1d4ed8;
+.login-button:hover {
+  background-color: #2557ca;
 }
 
 .message {
+  margin-top: 20px;
+  padding: 13px;
   text-align: center;
-  margin-top: 22px;
-  color: #334155;
   font-weight: bold;
-  font-size: 16px;
-  background-color: #eff6ff;
-  padding: 12px;
+  background-color: #edf4ff;
+  border-radius: 9px;
+}
+
+/* Student dashboard */
+
+.student-page {
+  min-height: 100vh;
+  padding: 30px;
+  background-color: #dceafd;
+}
+
+.dashboard-card {
+  width: 100%;
+  max-width: 1150px;
+  min-height: 620px;
+  margin: 0 auto;
+  padding: 28px;
+  background-color: white;
+  border-top: 8px solid #2f66e8;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(23, 35, 59, 0.15);
+}
+
+.dashboard-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.welcome-text {
+  margin: 0;
+  font-size: 17px;
+}
+
+.dashboard-title {
+  margin: 0;
+  text-align: center;
+  font-size: 34px;
+}
+
+.sign-out-button {
+  justify-self: end;
+  padding: 9px 18px;
+  font-size: 15px;
+  color: #2f66e8;
+  background-color: transparent;
+  border: 2px solid #2f66e8;
   border-radius: 8px;
+  cursor: pointer;
+}
+
+.sign-out-button:hover {
+  color: white;
+  background-color: #2f66e8;
+}
+
+.dashboard-tabs {
+  display: flex;
+  overflow: hidden;
+  border: 2px solid #2f66e8;
+  border-radius: 10px 10px 0 0;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 15px;
+  font-size: 17px;
+  font-weight: bold;
+  color: #17233b;
+  background-color: #d6e4fa;
+  border: none;
+  cursor: pointer;
+}
+
+.tab-button:first-child {
+  border-right: 1px solid #2f66e8;
+}
+
+.tab-button:hover {
+  background-color: #bfd3f4;
+}
+
+.active-tab {
+  color: white;
+  background-color: #2f66e8;
+}
+
+.active-tab:hover {
+  background-color: #2f66e8;
+}
+
+.dashboard-content {
+  min-height: 420px;
+  padding: 35px;
+  background-color: #edf4ff;
+  border: 2px solid #2f66e8;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.course-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.course-table th,
+.course-table td {
+  padding: 14px;
+  text-align: left;
+  border: 1px solid #ccd7e5;
+}
+
+.course-table th {
+  color: white;
+  background-color: #2f66e8;
+}
+
+.course-table tbody tr:nth-child(even) {
+  background-color: #edf4ff;
+}
+
+.course-table tbody tr:hover {
+  background-color: #dceafd;
+}
+
+.add-button,
+.drop-button {
+  min-width: 80px;
+  padding: 8px 13px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.add-button {
+  color: white;
+  background-color: #2f66e8;
+  border: 2px solid #2f66e8;
+}
+
+.add-button:hover {
+  background-color: #2557ca;
+}
+
+.drop-button {
+  color: #c62828;
+  background-color: white;
+  border: 2px solid #c62828;
+}
+
+.drop-button:hover {
+  color: white;
+  background-color: #c62828;
+}
+
+.enrolled-text {
+  font-weight: bold;
+  color: #18713c;
+}
+
+.full-text {
+  font-weight: bold;
+  color: #c62828;
+}
+
+.status-text {
+  margin-top: 70px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.course-message {
+  margin: 0 0 20px;
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  background-color: white;
+  border: 1px solid #ccd7e5;
+  border-radius: 8px;
+}
+
+@media (max-width: 750px) {
+  .student-page {
+    padding: 15px;
+  }
+
+  .dashboard-card {
+    padding: 18px;
+  }
+
+  .dashboard-header {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    text-align: center;
+  }
+
+  .dashboard-title {
+    grid-row: 1;
+  }
+
+  .welcome-text {
+    grid-row: 2;
+  }
+
+  .sign-out-button {
+    grid-row: 3;
+    justify-self: center;
+  }
+
+  .dashboard-content {
+    padding: 18px;
+  }
+
+  .course-table {
+    min-width: 750px;
+  }
+
+  .page-title {
+    font-size: 34px;
+  }
+
+  .login-card {
+    padding: 30px 22px;
+  }
 }
