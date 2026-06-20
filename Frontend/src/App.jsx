@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Login from "./pages/Login";
 import StudentDashboard from "./pages/StudentDashboard";
+import TeacherDashboard from "./pages/TeacherDashboard"
 
 // import TeacherDashboard from "./pages/TeacherDashboard"; Add this back for teacher section Uday
 
@@ -14,6 +15,14 @@ function App() {
 
   const [loading, setLoading] = useState(false);
   const [courseMessage, setCourseMessage] = useState("");
+
+  //Teacher Part
+  const [teacherClasses, setTeacherClasses] = useState([]);
+  const [selectedTeacherClass, setSelectedTeacherClass] = useState(null);
+  const [teacherRoster, setTeacherRoster] = useState([]);
+  
+  const [teacherLoading, setTeacherLoading] = useState(false);
+  const [teacherMessage, setTeacherMessage] = useState("");
 
   async function handleLogin(username, password, setMessage) {
   if (username.trim() === "" || password.trim() === "") {
@@ -62,14 +71,10 @@ function App() {
     }
 
     if (userData.role === "teacher") {
-      setMessage(
-        "Logged in, but make the Teacher Dashboard UDAY !!."
-      );
+      setUser(userData);
+      setMessage("");
 
-      await fetch("/logout", {
-        method: "POST",
-        credentials: "include",
-      });
+      await loadTeacherData();
 
       return;
     }
@@ -128,6 +133,94 @@ function App() {
       setCourseMessage("Could not connect to the backend.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadTeacherData() {
+    setTeacherLoading(true);
+    setTeacherMessage("");
+
+    try {
+      const response = await fetch("/teacher/classes", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setTeacherMessage(data.error || "Could not load teacher classes.");
+        return;
+      }
+
+      setTeacherClasses(data);
+    } catch (error) {
+      console.error("Teacher classes error:", error);
+      setTeacherMessage("Could not connect to the backend.");
+    } finally {
+      setTeacherLoading(false);
+    }
+  }
+
+  async function loadTeacherRoster(course) {
+    setSelectedTeacherClass(course);
+    setTeacherRoster([]);
+    setTeacherMessage("");
+
+    try {
+      const response = await fetch(`/teacher/class/${course.id}`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setTeacherMessage(data.error || "Could not load class roster.");
+        return;
+      }
+
+      setTeacherRoster(data);
+    } catch (error) {
+      console.error("Teacher roster error:", error);
+      setTeacherMessage("Could not connect to the backend.");
+    }
+  }
+
+    async function handleUpdateGrade(enrollmentId, grade) {
+    setTeacherMessage("");
+
+    try {
+      const response = await fetch("/teacher/grade", {
+        method: "PUT",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        credentials: "include",
+
+        body: JSON.stringify({
+          enrollment_id: enrollmentId,
+          grade: grade,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setTeacherMessage(data.error || "Could not update grade.");
+        return;
+      }
+
+      setTeacherMessage(data.message || "Grade updated.");
+
+      if (selectedTeacherClass !== null) {
+        await loadTeacherRoster(selectedTeacherClass);
+      }
+    } catch (error) {
+      console.error("Grade update error:", error);
+      setTeacherMessage("Could not connect to the backend.");
     }
   }
 
@@ -213,6 +306,12 @@ function App() {
     setMyCourses([]);
     setAllCourses([]);
     setCourseMessage("");
+
+    setTeacherClasses([]);
+    setSelectedTeacherClass(null);
+    setTeacherRoster([]);
+    setTeacherMessage("");
+
   }
 
   if (user === null) {
@@ -229,6 +328,22 @@ function App() {
         courseMessage={courseMessage}
         handleEnroll={handleEnroll}
         handleDrop={handleDrop}
+        handleLogout={handleLogout}
+      />
+    );
+  }
+
+  if (user.role === "teacher") {
+    return (
+      <TeacherDashboard
+        user={user}
+        teacherClasses={teacherClasses}
+        selectedTeacherClass={selectedTeacherClass}
+        teacherRoster={teacherRoster}
+        teacherLoading={teacherLoading}
+        teacherMessage={teacherMessage}
+        loadTeacherRoster={loadTeacherRoster}
+        handleUpdateGrade={handleUpdateGrade}
         handleLogout={handleLogout}
       />
     );

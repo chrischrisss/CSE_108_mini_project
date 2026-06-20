@@ -7,6 +7,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.menu import MenuLink
+from sqlalchemy import inspect, text
 
 app = Flask(__name__)
 
@@ -30,6 +31,13 @@ jwt = JWTManager(app)
 with app.app_context():
 
     db.create_all()
+
+    course_columns = inspect(db.engine).get_columns("course")
+    course_column_names = [column["name"] for column in course_columns]
+
+    if "time" not in course_column_names:
+        db.session.execute(text("ALTER TABLE course ADD COLUMN time VARCHAR(50)"))
+        db.session.commit()
 
     if not User.query.filter_by(username="admin").first():
         admin_user = User(
