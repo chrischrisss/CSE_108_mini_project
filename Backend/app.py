@@ -7,7 +7,6 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.menu import MenuLink
-from sqlalchemy import inspect, text
 
 app = Flask(__name__)
 
@@ -31,13 +30,6 @@ jwt = JWTManager(app)
 with app.app_context():
 
     db.create_all()
-
-    course_columns = inspect(db.engine).get_columns("course")
-    course_column_names = [column["name"] for column in course_columns]
-
-    if "time" not in course_column_names:
-        db.session.execute(text("ALTER TABLE course ADD COLUMN time VARCHAR(50)"))
-        db.session.commit()
 
     if not User.query.filter_by(username="admin").first():
         admin_user = User(
@@ -190,6 +182,12 @@ def dashboard():
 @jwt_required()
 def get_courses():
 
+
+    claims = get_jwt()
+
+    if claims["role"] != "student":
+        return {"error": "Forbidden"}, 403
+
     courses = Course.query.all()
 
     result = []
@@ -216,6 +214,11 @@ def get_courses():
 @jwt_required()
 def my_courses():
 
+    claims = get_jwt()
+
+    if claims["role"] != "student":
+        return {"error": "Forbidden"}, 403
+
     user_id = int(get_jwt_identity())
 
     enrollments = Enrollment.query.filter_by(
@@ -239,6 +242,11 @@ def my_courses():
 @app.route("/enroll", methods=["POST"])
 @jwt_required()
 def enroll():
+
+    claims = get_jwt()
+
+    if claims["role"] != "student":
+        return {"error": "Forbidden"}, 403
 
     student_id = int(get_jwt_identity())
 
@@ -277,6 +285,11 @@ def enroll():
 @app.route("/drop", methods=["POST"])
 @jwt_required()
 def drop_course():
+
+    claims = get_jwt()
+
+    if claims["role"] != "student":
+        return {"error": "Forbidden"}, 403
 
     student_id = int(get_jwt_identity())
     course_id = request.json["course_id"]
@@ -395,31 +408,6 @@ def update_grade():
 
     return {"message": "Grade updated"}
 
-@app.route("/")
-def index():
-    return render_template("login.html")
-
-@app.route("/student")
-@jwt_required()
-def student_page():
-
-    if not require_role("student"):
-        return {"error": "Forbidden"}, 403
-
-    return render_template("student.html")
-
-@app.route("/teacher")
-@jwt_required()
-def teacher_page():
-
-    if not require_role("teacher"):
-        return {"error": "Forbidden"}, 403
-
-    return render_template("teacher.html")
-
-# @app.route("/admin")
-# def admin_page():
-#     return render_template("admin.html")
 
 @app.route("/me")
 @jwt_required()
