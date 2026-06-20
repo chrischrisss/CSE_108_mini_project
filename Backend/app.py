@@ -1,19 +1,45 @@
 from models import *
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, session, redirect
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt, \
-    set_access_cookies, unset_jwt_cookies
+    set_access_cookies, unset_jwt_cookies, verify_jwt_in_request
+
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+from flask_admin.menu import MenuLink
 
 app = Flask(__name__)
 
 CORS(app, supports_credentials=True)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite3"
+
+app.config["SECRET_KEY"] = "super-secret-key"
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = False
+
 db.init_app(app)
+
+app.config["JWT_SECRET_KEY"] = "super-secret-key"
+
+app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+app.config["JWT_COOKIE_SECURE"] = False
+app.config["JWT_COOKIE_CSRF_PROTECT"] = False
+jwt = JWTManager(app)
 
 #created filler content for db to test (remember to change this to real names)
 with app.app_context():
 
     db.create_all()
+
+    if not User.query.filter_by(username="admin").first():
+        admin_user = User(
+            username="admin",
+            password="password",
+            role="admin"
+        )
+
+        db.session.add(admin_user)
+        db.session.commit()
 
     if not User.query.filter_by(username="student1").first():
         student = User(
@@ -48,20 +74,56 @@ with app.app_context():
         course = Course(
             name="Math 101",
             capacity=30,
+            time="TR 11:00-11:50 AM",
             teacher_id=teacher.id
         )
 
         db.session.add(course)
         db.session.commit()
 
+admin = Admin(app, name="Course Registration Admin")
 
 
-app.config["JWT_SECRET_KEY"] = "super-secret-key"
+class AdminOnlyView(ModelView):
+    def is_accessible(self):
+        admin_id = session.get("admin")
+        if admin_id:
+            user = User.query.get(admin_id)
+            if user and user.role == "admin":
+                return True
 
-app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
-app.config["JWT_COOKIE_SECURE"] = False
-app.config["JWT_COOKIE_CSRF_PROTECT"] = False
-jwt = JWTManager(app)
+        try:
+            verify_jwt_in_request(optional=True)
+            claims = get_jwt()
+            return claims.get("role") == "admin"
+        except Exception:
+            return False
+
+    def inaccessible_callback(self, name, **kwargs):
+        return "Forbidden", 403
+
+
+admin.add_view(AdminOnlyView(User, db.session))
+admin.add_view(AdminOnlyView(Course, db.session))
+admin.add_view(AdminOnlyView(Enrollment, db.session))
+admin.add_link(MenuLink(name="Logout", url="/logout"))
+
+
+@app.route("/admin-login", methods=["POST"])
+def admin_login():
+    data = request.get_json()
+
+    user = User.query.filter_by(
+        username=data["username"],
+        password=data["password"]
+    ).first()
+
+    if not user or user.role != "admin":
+        return {"error": "Forbidden"}, 403
+
+    session["admin"] = user.id
+    return {"message": "admin logged in"}
+
 
 
 def require_role(role):
@@ -88,15 +150,24 @@ def login():
         additional_claims={"role": user.role}
     )
 
+    if user.role == "admin":
+        session["admin"] = user.id
+
     response = jsonify({"msg": "login successful"})
-    set_access_cookies(response, access_token)  # 👈 KEY CHANGE
+    set_access_cookies(response, access_token)
 
     return response
 
 
-@app.route("/logout", methods=["POST"])
+@app.route("/logout", methods=["POST", "GET"])
 def logout():
-    response = jsonify({"msg": "logged out"})
+    session.pop("admin", None)
+    
+    if request.method == "GET":
+        response = redirect("/")
+    else:
+        response = jsonify({"msg": "logged out"})
+
     unset_jwt_cookies(response)
     return response
 
@@ -127,6 +198,7 @@ def get_courses():
             "teacher": course.teacher.username,
             "capacity": course.capacity,
             "enrolled": enrolled_count,
+            "time": course.time
         })
 
     return jsonify(result)
@@ -149,7 +221,8 @@ def my_courses():
         result.append({
             "course_id": enrollment.course.id,
             "course_name": enrollment.course.name,
-            "grade": enrollment.grade
+            "grade": enrollment.grade,
+            "time": enrollment.course.time
         })
 
     return jsonify(result)
@@ -240,9 +313,10 @@ def teacher_classes():
             "id": course.id,
             "name": course.name,
             "capacity": course.capacity,
-            "teacher": course.teacher.username
+            "teacher": course.teacher.username,
 
             # ----------------- Add course time here ------------------
+            "time": course.time
         })
 
     return jsonify(result)

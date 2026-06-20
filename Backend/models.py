@@ -15,6 +15,7 @@ class Course(db.Model):
     capacity = db.Column(db.Integer, nullable=False)
 
     teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    time = db.Column(db.String(50))
 
     teacher = db.relationship(
         "User",
