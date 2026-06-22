@@ -221,6 +221,9 @@ function TeacherRosterTable({
                   <td>{enrollment.username}</td>
                   <td>
                     <input
+                      type="number"
+                      min="1"
+                      max="100"
                       value={
                         gradeChanges[enrollment.enrollment_id] ??
                         enrollment.grade ??

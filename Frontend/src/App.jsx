@@ -2,6 +2,7 @@ import { useState } from "react";
 import Login from "./pages/Login";
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard"
+import AdminDashboard from "./pages/AdminDashboard";
 
 // import TeacherDashboard from "./pages/TeacherDashboard"; Add this back for teacher section Uday
 
@@ -23,6 +24,14 @@ function App() {
   
   const [teacherLoading, setTeacherLoading] = useState(false);
   const [teacherMessage, setTeacherMessage] = useState("");
+
+  const [adminData, setAdminData] = useState({
+    users: [],
+    courses: [],
+    enrollments: [],
+  });
+  const [adminLoading, setAdminLoading] = useState(false);
+  const [adminMessage, setAdminMessage] = useState("");
 
   async function handleLogin(username, password, setMessage) {
   if (username.trim() === "" || password.trim() === "") {
@@ -75,6 +84,15 @@ function App() {
       setMessage("");
 
       await loadTeacherData();
+
+      return;
+    }
+
+    if (userData.role === "admin") {
+      setUser(userData);
+      setMessage("");
+
+      await loadAdminData();
 
       return;
     }
@@ -184,6 +202,64 @@ function App() {
     } catch (error) {
       console.error("Teacher roster error:", error);
       setTeacherMessage("Could not connect to the backend.");
+    }
+  }
+
+  async function loadAdminData() {
+    setAdminLoading(true);
+    setAdminMessage("");
+
+    try {
+      const response = await fetch("/admin/data", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setAdminMessage(data.error || "Could not load admin data.");
+        return;
+      }
+
+      setAdminData(data);
+    } catch (error) {
+      console.error("Admin data error:", error);
+      setAdminMessage("Could not connect to the backend.");
+    } finally {
+      setAdminLoading(false);
+    }
+  }
+
+  async function adminAction(url, method, body) {
+    setAdminMessage("");
+
+    try {
+      const options = {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      };
+
+      if (body !== undefined) {
+        options.body = JSON.stringify(body);
+      }
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+
+      if (!response.ok) {
+        setAdminMessage(data.error || "Admin action failed.");
+        return;
+      }
+
+      await loadAdminData();
+      setAdminMessage(data.message || "Admin action completed.");
+    } catch (error) {
+      console.error("Admin action error:", error);
+      setAdminMessage("Could not connect to the backend.");
     }
   }
 
@@ -312,6 +388,9 @@ function App() {
     setTeacherRoster([]);
     setTeacherMessage("");
 
+    setAdminData({ users: [], courses: [], enrollments: [] });
+    setAdminMessage("");
+
   }
 
   if (user === null) {
@@ -344,6 +423,19 @@ function App() {
         teacherMessage={teacherMessage}
         loadTeacherRoster={loadTeacherRoster}
         handleUpdateGrade={handleUpdateGrade}
+        handleLogout={handleLogout}
+      />
+    );
+  }
+
+  if (user.role === "admin") {
+    return (
+      <AdminDashboard
+        user={user}
+        adminData={adminData}
+        adminLoading={adminLoading}
+        adminMessage={adminMessage}
+        adminAction={adminAction}
         handleLogout={handleLogout}
       />
     );

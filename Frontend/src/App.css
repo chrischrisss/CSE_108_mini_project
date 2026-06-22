@@ -293,6 +293,34 @@ input {
   border-radius: 8px;
 }
 
+/* Admin dashboard */
+
+.admin-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.admin-form input,
+.admin-form select,
+.course-table input,
+.course-table select {
+  min-width: 110px;
+  padding: 8px;
+  border: 1px solid #ccd7e5;
+  border-radius: 6px;
+}
+
+.admin-form .add-button {
+  min-width: 90px;
+}
+
+.dashboard-content h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+
 @media (max-width: 750px) {
   .student-page {
     padding: 15px;
