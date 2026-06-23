@@ -128,7 +128,7 @@ function CoursesPanel({ courses, users, adminAction }) {
       <h2>Courses</h2>
       <div className="table-container">
         <table className="course-table">
-          <thead><tr><th>Name</th><th>Capacity</th><th>Teacher</th><th>Time</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Name</th><th>Capacity</th><th>Filled</th><th>Teacher</th><th>Time</th><th>Actions</th></tr></thead>
           <tbody>{courses.map(function (course) { return <CourseRow key={course.id} course={course} teachers={teachers} adminAction={adminAction} />; })}</tbody>
         </table>
       </div>
@@ -143,6 +143,7 @@ function CourseRow({ course, teachers, adminAction }) {
     <tr>
       <td><input value={editedCourse.name} onChange={function (event) { setEditedCourse({ ...editedCourse, name: event.target.value }); }} /></td>
       <td><input type="number" min="1" value={editedCourse.capacity} onChange={function (event) { setEditedCourse({ ...editedCourse, capacity: event.target.value }); }} /></td>
+      <td>{course.enrolled}</td>
       <td><select value={editedCourse.teacher_id} onChange={function (event) { setEditedCourse({ ...editedCourse, teacher_id: event.target.value }); }}>{teachers.map(function (teacher) { return <option key={teacher.id} value={teacher.id}>{teacher.username}</option>; })}</select></td>
       <td><input value={editedCourse.time} onChange={function (event) { setEditedCourse({ ...editedCourse, time: event.target.value }); }} /></td>
       <td><button className="add-button" onClick={function () { adminAction(`/admin/courses/${course.id}`, "PUT", editedCourse); }}>Save</button> <button className="drop-button" onClick={function () { adminAction(`/admin/courses/${course.id}`, "DELETE"); }}>Delete</button></td>

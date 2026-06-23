@@ -166,7 +166,7 @@ function TeacherCoursesTable({
                     ? course.time
                     : "Not available"}
                 </td>
-                <td>{course.capacity}</td>
+                <td>{course.enrolled}/{course.capacity}</td>
                 <td>
                   <button
                     className="add-button"

@@ -421,10 +421,15 @@ def teacher_classes():
     result = []
 
     for course in courses:
+        enrolled_count = Enrollment.query.filter_by(
+            course_id=course.id
+        ).count()
+
         result.append({
             "id": course.id,
             "name": course.name,
             "capacity": course.capacity,
+            "enrolled": enrolled_count,
             "teacher": course.teacher.username,
 
             # ----------------- Add course time here ------------------
@@ -565,10 +570,15 @@ def admin_data():
 
     courses = []
     for course in Course.query.all():
+        enrolled_count = Enrollment.query.filter_by(
+            course_id=course.id
+        ).count()
+
         courses.append({
             "id": course.id,
             "name": course.name,
             "capacity": course.capacity,
+            "enrolled": enrolled_count,
             "teacher_id": course.teacher_id,
             "teacher": course.teacher.username,
             "time": course.time or ""
